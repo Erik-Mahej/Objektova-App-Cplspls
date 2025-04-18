@@ -30,62 +30,38 @@ public:
         cout << "Maker: " << maker << ", Model: " << model << ", Year: " << makeyear
              << ", Milage: " << milage << " KM, Owners: " << owners << endl;
     }
-};
+}; 
 
-void saveToFile(const vector<car>& cars) {
-    ofstream file("cars.txt");
-    if (file.is_open()) {
-        for (const auto& car : cars) {
-            file << car.maker << "," << car.model << "," << car.makeyear << ","
-                 << car.milage << "," << car.owners << endl;
-        }
-        file.close();
-    } else {
-        cout << "Unable to save cars to file." << endl;
-    }
-}
-
-vector<car> loadFromFile() {
-    vector<car> cars;
-    ifstream file("cars.txt");
-    if (file.is_open()) {
-        string line;
-        while (getline(file, line)) {
-            stringstream ss(line);
-            string maker, model;
-            int makeyear, milage, owners;
-            char comma; // To handle the commas in the file
-            ss >> maker >> comma >> model >> comma >> makeyear >> comma >> milage >> comma >> owners;
-            cars.push_back({makeyear, milage, owners, model, maker});
-        }
-        file.close();
-    } else {
-        cout << "No saved cars found. Starting with an empty list." << endl;
-    }
-    return cars;
-}
 
 int main() {
-    vector<car> cars = loadFromFile(); // Load cars from file
     int choice;
+    vector<car> cars; // Persistent vector to store cars
 
     while (true) {
         cout << "What would you like to do?\n1. Register a car\n2. View your cars\n3. Exit\n";
         cin >> choice;
 
+        // Validate input
+        if (cin.fail()) {
+            cin.clear(); // Clear the error flag
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+            cout << "Invalid input. Please enter a number between 1 and 3.\n";
+            continue;
+        }
+
         if (choice == 1) {
-            car newCar;
-            newCar.registration();
-            cars.push_back(newCar);
-            saveToFile(cars); // Save cars to file after registration
+            car newCar; // Create a new car object
+            newCar.registration(); // Register the new car
+            cars.push_back(newCar); // Add new car to the vector
             cout << "Car registered successfully!\n";
         } else if (choice == 2) {
-            if (cars.empty()) {
+            if (cars.empty()) { // Check if the vector is empty
                 cout << "No cars registered yet.\n";
-            } else {
-                cout << "Registered Cars:\n";
-                for (const auto& c : cars) {
-                    &c.display();
+            } else { // Display all registered cars
+                cout << "Registered cars:\n";
+                for (size_t i = 0; i < cars.size(); ++i) { // Iterate through the vector
+                    cout << i + 1 << ". ";
+                    cars[i].display();
                 }
             }
         } else if (choice == 3) {
